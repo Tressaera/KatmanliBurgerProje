@@ -1,0 +1,78 @@
+﻿@model BurgerUpdateDto
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+div class="content">
+<div class="container-fluid">
+    <h4 class="page-title">Ürün İşlemleri</h4>
+    <div class="row">
+        <div class="col-md-12">
+            <form method="post">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Ürün Güncelle</div>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group">
+                            <label for="Name">Ürün Adı:</label>
+                            <input type="text" class="form-control" asp-for="Name" id="Name">
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="Price">Fiyat:</label>
+                            <input type="text" class="form-control" asp-for="Price" id="Price">
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="Image">Ürün Görsel</label>
+                            <input type="text" class="form-control" asp-for="Image" id="Image">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="price">Hamburger İçeriği</label>
+                            @foreach (var item in Model.AllGarnitures)
+                            {
+                                if (Model.Garnitures.Any(x => x.GarnitureId == item.Id))
+                                {
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" value="@item.Id" name="selectedgarniture" checked>
+                                        <span class="form-check-sign">@item.Name</span>
+                                    </label>
+                                }
+                                else
+                                {
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" value="@item.Id" name="selectedgarniture">
+                                        <span class="form-check-sign">@item.Name</span>
+                                    </label>
+
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="Description">Ürün Açıklaması:</label>
+                            <input type="text" class="form-control" asp-for="Description" id="Description">
+
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <button class="btn btn-primary" type="submit">Ürünü Güncelle</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+

@@ -1,0 +1,228 @@
+﻿
+@model OrderListViewModel
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<style>
+	.hiddenRow {
+		padding: 0 !important;
+	}
+</style>
+
+@await Component.InvokeAsync("_UILayoutHeadComponentPartial")
+
+<body class="sub_page">
+
+	@await Component.InvokeAsync("_MenuNavbarComponentPartial")
+	<br />
+	<br />
+	<div class="container-fluid">
+		<div class="row px-xl-5">
+			<div class="col-12">
+				<nav class="breadcrumb bg-dark mb-30">
+					<a class="breadcrumb-item text-white" href="/Default/Index">Ana Sayfa</a>
+					<a class="breadcrumb-item text-white" href="/Menu/Index">Menü</a>
+					<span class="breadcrumb-item active">Siparişleriniz</span>
+				</nav>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row px-xl-5">
+			<div class="col-lg-12 table-responsive mb-5">
+
+				<div class="container">
+					<div class="col-md-12">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Sipariş Numarası</th>
+									<th>Sipariş Tarihi</th>
+									<th>Toplam Tutar</th>
+									<th>Detaylar</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								@foreach (var item in Model.Orders)
+								{
+									<tr data-toggle="collapse" data-target="#accordionTable-@item.Id">
+										<td class="align-middle">@item.Id</td>
+										<td class="align-middle">@item.CreatedDate.ToShortDateString()</td>
+										<td class="align-middle">@item.TotalPrice₺</td>
+										<td>
+											<button class="btn btn-secondary btn-lg" type="button" data-toggle="collapse" data-target="#accordionTable-@item.Id" aria-expanded="true">
+												Göster
+											</button>
+										</td>
+									</tr>
+
+									<tr>
+										<td colspan="12" class="hiddenRow">
+											<div class="collapse" id="accordionTable-@item.Id">
+												<table class="table table-striped">
+													<thead>
+														<tr>
+															<th>Ürün Ad</th>
+															<th>Fiyat</th>
+														</tr>
+													</thead>
+													@foreach (var order in Model.Orders)
+													{
+														if (order.Id == item.Id)
+														{
+															if (order.MenuOrders != null)
+															{
+																foreach (var menuOrder in order.MenuOrders)
+																{
+																	<tbody>
+																		<tr>
+																			<td>@menuOrder.Menu.Name</td>
+																			<td>@menuOrder.Menu.Price₺ + KDV</td>
+																		</tr>
+																	</tbody>
+																}
+															}
+															if (order.BurgerOrders != null)
+															{
+																foreach (var burgerOrder in order.BurgerOrders)
+																{
+																	<tbody>
+																		<tr>
+																			<td>@burgerOrder.Burger.Name</td>
+																			<td>@burgerOrder.Burger.Price₺ + KDV</td>
+																		</tr>
+																	</tbody>
+																}
+															}
+
+															if (order.OrderByProducts != null)
+															{
+																foreach (var orderByProduct in order.OrderByProducts)
+																{
+																	<tbody>
+																		<tr>
+																			<td>@orderByProduct.ByProduct.Name</td>
+																			<td>@orderByProduct.ByProduct.Price₺ + KDV</td>
+																		</tr>
+																	</tbody>
+																}
+															}
+														}
+													}
+												</table>
+
+											</div>
+										</td>
+									</tr>
+								}
+
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+	@await Component.InvokeAsync("_UILayoutFooterComponentPartial")
+
+	@await Component.InvokeAsync("_UILayoutScriptComponentPartial")
+
+</body>
+
+</html>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+	$(document).ready(function () {
+		// Butona tıklama olayını dinleyip metni değiştirme
+		$('.btn.btn-warning').click(function () {
+			var buttonText = $(this).text();
+			if (buttonText.trim() === 'Göster') {
+				$(this).text('Kapat');
+			} else {
+				$(this).text('Göster');
+			}
+		});
+	});
+</script>
+
+@functions {
+
+	string GetProductName(dynamic item)
+	{
+		if (item.ByProduct != null)
+		{
+			return item.ByProduct.Name;
+		}
+		else if (item.Menu != null)
+		{
+			return item.Menu.Name;
+		}
+		else if (item.Burger != null)
+		{
+			return item.Burger.Name;
+		}
+		return "";
+	}
+
+	int GetQuantity(dynamic item)
+	{
+		if (item.ByProductQuantity > 0)
+		{
+			return item.ByProductQuantity;
+		}
+		else if (item.MenuQuantity > 0)
+		{
+			return item.MenuQuantity;
+		}
+		else if (item.BurgerQuantity > 0)
+		{
+			return item.BurgerQuantity;
+		}
+		return 0;
+	}
+
+	decimal GetPrice(dynamic item)
+	{
+		if (item.ByProduct != null)
+		{
+			return item.ByProduct.Price;
+		}
+		else if (item.Menu != null)
+		{
+			return item.Menu.Price;
+		}
+		else if (item.Burger != null)
+		{
+			return item.Burger.Price;
+		}
+		return 0;
+	}
+
+	string GetDetails(dynamic item)
+	{
+		if (item.ProductOrder != null)
+		{
+			return $"Ürün: {item.ByProduct.Name}  Adet: {item.ByProductQuantity}  Fiyat: {item.ByProduct.Price}";
+		}
+		else if (item.Menu != null)
+		{
+			return $"Ürün: {item.Menu.Name} Adet: {item.MenuQuantity} Fiyat: {item.Menu.Price}";
+		}
+		else if (item.Burger != null)
+		{
+			return $"Ürün: {item.Burger.Name} Adet: {item.BurgerQuantity}  Fiyat: {item.Burger.Price}";
+		}
+		return "";
+	}
+}
